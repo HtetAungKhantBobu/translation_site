@@ -16,19 +16,19 @@ This project is developed partly out of boredom, and partly to dust my github ac
 Well, you only need **Docker**, and an **internet connection** i think.
 
   1. run the following command in root project folder.
-    ```shell
+    ```
         docker build .
     ```
   2. run the following command after the docker image is successfully build.
-    ```shell
+    ```
         docker compose up
     ```
   3. *go inside* the docker container using
-    ```shell
+    ```
         docker exec -it translations_web bash
     ``` 
   4. run the *migrations* using
-    ```shell
+    ```
         python manage.py migrate
     ```
   5. to *browse* currently availabe endpoints, go to *localhost:8000/api-explorer/*
