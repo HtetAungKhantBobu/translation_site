@@ -1,0 +1,14 @@
+#pycahce
+__pycache__/
+
+#editor settings
+.vscode/
+
+#mac bs
+.DS_Store
+
+#env files
+.env/
+
+#sqlitefiles
+db.sqlite3

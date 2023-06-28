@@ -1,0 +1,21 @@
+version: "3"
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: translations_web
+    volumes:
+      - .:/code 
+    depends_on:
+      - db
+  
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_PASSWORD=password
+      - PG_DATA=/tmp
+    ports:
+      - "5432:5432"
+    container_name: translations_db
