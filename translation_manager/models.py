@@ -79,7 +79,9 @@ class Chapter(models.Model):
         default=Status.UNKNOWN,
     )
     contents = models.TextField("Translated Content", blank=True)
-    published_date = models.DateTimeField("Published Date and Time")
+    published_date = models.DateTimeField(
+        "Published Date and Time", blank=True, null=True
+    )
     created_at = models.DateTimeField(editable=False, auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

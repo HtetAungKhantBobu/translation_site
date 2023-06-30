@@ -6,17 +6,49 @@ class ConciseTranslationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Translation
         fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
 
 
-class ChapterSerializer(serializers.ModelSerializer):
+class ConciseChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields = "__all__"
+        fields = [
+            field.name
+            for field in Chapter._meta.fields
+            if field.name not in ["contents"]
+        ]
+        read_only_fields = ("id",)
+        optional_fields = [field for field in fields if field != "id"]
 
 
 class DetailedTranslationSerializer(ConciseTranslationSerializer):
-    chapters = ChapterSerializer(source="chapter_set", many=True, read_only=True)
+    title = serializers.CharField(required=False)
+    chapters = ConciseChapterSerializer(source="chapter_set", many=True, read_only=True)
 
     class Meta:
         model = Translation
-        fields = [field.name for field in Translation._meta.fields] + ["chapters"]
+        fields = (
+            ["title"]
+            + [
+                field.name
+                for field in Translation._meta.fields
+                if field.name not in ["title"]
+            ]
+            + ["chapters"]
+        )
+        read_only_fields = ("id",)
+        optional_fields = [field for field in fields if field != "id"]
+
+
+class DetailedChapterSerializer(ConciseChapterSerializer):
+    title = serializers.CharField(required=False)
+    published_date = serializers.DateTimeField(required=False)
+    parent_translation = serializers.IntegerField(
+        required=False, source="parent_translation.id"
+    )
+
+    class Meta:
+        model = Chapter
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+        optional_fields = [field for field in fields if field != "id"]

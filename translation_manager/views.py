@@ -9,8 +9,9 @@ from translation_manager.models import Translation, Chapter
 from translation_site.permissions import *
 from translation_manager.serializers import (
     ConciseTranslationSerializer,
-    ChapterSerializer,
+    ConciseChapterSerializer,
     DetailedTranslationSerializer,
+    DetailedChapterSerializer,
 )
 
 
@@ -34,9 +35,9 @@ class TranslationViewSet(viewsets.GenericViewSet):
             status=status.HTTP_200_OK,
         )
 
-    @swagger_auto_schema(method="GET")
+    @swagger_auto_schema(methods=["GET", "PATCH"])
     @action(
-        methods=["GET"],
+        methods=["GET", "PATCH"],
         permission_classes=[AllowAny],
         detail=True,
         serializer_class=DetailedTranslationSerializer,
@@ -45,17 +46,29 @@ class TranslationViewSet(viewsets.GenericViewSet):
         """
         A detailed view for each chapter
         """
-        translation = get_object_or_404(Translation, id=pk)
-        return Response(
-            self.get_serializer(translation).data,
-            status=status.HTTP_200_OK,
-        )
+        if request.method == "GET":
+            translation = get_object_or_404(Translation, id=pk)
+            return Response(
+                self.get_serializer(translation).data,
+                status=status.HTTP_200_OK,
+            )
+        elif request.method == "PATCH":
+            translation = get_object_or_404(Translation, id=pk)
+            serializer = self.get_serializer(translation, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                {
+                    "data": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
 
 
 class ChapterViewSet(viewsets.GenericViewSet):
     permission_classes = [AllowAny]
     queryset = Chapter.objects.all()
-    serializer_class = ChapterSerializer
+    serializer_class = ConciseChapterSerializer
 
     def get_serializer_class(self):
         if self.serializer_class is None:
@@ -74,20 +87,30 @@ class ChapterViewSet(viewsets.GenericViewSet):
 
     @swagger_auto_schema(method="GET")
     @action(
-        methods=["GET"],
+        methods=["GET", "PATCH"],
         permission_classes=[AllowAny],
         detail=True,
-        serializer_class=ChapterSerializer,
+        serializer_class=DetailedChapterSerializer,
     )
     def details(self, request, pk):
         """
         A detailed view for each chapter
         """
-        chapter = get_object_or_404(Chapter, id=pk)
-        return Response(
-            self.get_serializer(chapter).data,
-            status=status.HTTP_200_OK,
-        )
+        if request.method == "GET":
+            chapter = get_object_or_404(Chapter, id=pk)
+            return Response(
+                self.get_serializer(chapter).data,
+                status=status.HTTP_200_OK,
+            )
+        elif request.method == "PATCH":
+            chapter = get_object_or_404(Chapter, id=pk)
+            serializer = self.get_serializer(chapter, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK,
+            )
 
 
 # Create your views here.
