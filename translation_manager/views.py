@@ -35,6 +35,15 @@ class TranslationViewSet(viewsets.GenericViewSet):
             status=status.HTTP_200_OK,
         )
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
+
     @swagger_auto_schema(methods=["GET", "PATCH"])
     @action(
         methods=["GET", "PATCH"],
@@ -83,6 +92,15 @@ class ChapterViewSet(viewsets.GenericViewSet):
         return Response(
             data={"all_translations": serializer.data},
             status=status.HTTP_200_OK,
+        )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_201_CREATED,
         )
 
     @swagger_auto_schema(method="GET")
