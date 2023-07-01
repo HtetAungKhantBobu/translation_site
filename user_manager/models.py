@@ -3,12 +3,13 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.core.validators import RegexValidator
 from django.db import models
-from user_manager.manager import UserManager
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+
+from user_manager.manager import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):

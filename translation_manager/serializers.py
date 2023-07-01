@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from translation_manager.models import Translation, Chapter
+
+from translation_manager.models import Chapter, Translation
 
 
 class ConciseTranslationSerializer(serializers.ModelSerializer):

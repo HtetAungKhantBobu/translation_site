@@ -1,18 +1,19 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
-from translation_manager.models import Translation, Chapter
-from translation_site.permissions import *
+
+from translation_manager.models import Chapter, Translation
 from translation_manager.serializers import (
-    ConciseTranslationSerializer,
     ConciseChapterSerializer,
-    DetailedTranslationSerializer,
+    ConciseTranslationSerializer,
     DetailedChapterSerializer,
+    DetailedTranslationSerializer,
 )
+from translation_site.permissions import *
 
 
 class TranslationViewSet(viewsets.GenericViewSet):
