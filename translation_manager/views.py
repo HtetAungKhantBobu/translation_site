@@ -14,11 +14,12 @@ from translation_manager.serializers import (
     DetailedTranslationSerializer,
 )
 from translation_site.permissions import *
+from translation_site import params
 
 
 class TranslationViewSet(viewsets.GenericViewSet):
     permission_classes = [AllowAny]
-    queryset = Translation.objects.all()
+    queryset = Translation.objects.all().order_by("title")
     serializer_class = ConciseTranslationSerializer
 
     def get_serializer_class(self):
@@ -26,11 +27,28 @@ class TranslationViewSet(viewsets.GenericViewSet):
             return BaseSerializer
         return self.serializer_class
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            params.Q,
+            params.ASC,
+        ],
+    )
     def list(self, request, *args, **kwargs):
         """
-        List all the translations/series
+        List all the translations/series sorted by title in ascending order
+        params:
+            - q = optional Search
+            - asc = optional order (default ascending)
         """
-        serializer = self.get_serializer(self.queryset, many=True)
+        data = self.queryset
+        q = request.query_params.get("q")
+        asc = request.query_params.get("asc")
+        if q:
+            data = data.filter(title__icontains=q.lower())
+        if not asc:
+            data = data.order_by("-title")
+
+        serializer = self.get_serializer(data, many=True)
         return Response(
             data={"all_translations": serializer.data},
             status=status.HTTP_200_OK,
