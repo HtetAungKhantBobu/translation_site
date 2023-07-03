@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 
 from translation_site.permissions import *
-from user_manager.serializers import LoginSerializer
+from user_manager.serializers import LoginSerializer, RegisterUserSerializer
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -20,6 +20,21 @@ class AuthViewSet(viewsets.GenericViewSet):
         serializer_class=LoginSerializer,
     )
     def login(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    @action(
+        methods=["POST"],
+        detail=False,
+        permission_class=(AllowAny,),
+        serializer_class=RegisterUserSerializer,
+    )
+    def register(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

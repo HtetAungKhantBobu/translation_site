@@ -53,9 +53,7 @@ class LoginSerializer(UserSerializer):
         return super().to_representation(obj)
 
     def validate(self, data):
-        print("HERE")
         email = data.get("email")
-        print("HERE2")
         pwd = data.get("password")
         if not email and not pwd:
             raise ValidationError("Both Email and Password are required.")
@@ -64,14 +62,12 @@ class LoginSerializer(UserSerializer):
             user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
             raise ValidationError("Account Does not Exists.")
-        print(f"Data: {data}")
         return data
 
     def create(self, validated_data):
         user = authenticate(
             email=self.validated_data["email"], password=self.validated_data["password"]
         )
-        print("FOUND user")
         if not user:
             raise ValidationError(
                 {
@@ -80,3 +76,48 @@ class LoginSerializer(UserSerializer):
             )
 
         return Token.objects.get_or_create(user=user)[0]
+
+
+class RegisterUserSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=255, required=False)
+    password = serializers.CharField(
+        write_only=True, required=True, style={"input_type": "password"}
+    )
+    password2 = serializers.CharField(
+        write_only=True, required=True, style={"input_type": "password"}
+    )
+    email = serializers.EmailField(required=True)
+    phone = serializers.CharField(max_length=15, required=False)
+
+    def validate(self, data):
+        email = data.get("email")
+        if User.objects.filter(email__iexact=email).exists():
+            return ValidationError(
+                {"non_field_errors": ["This email is already in use."]}
+            )
+        if not data.get("password") == data.get("password2"):
+            return ValidationError({"non_field_errors": ["Passwords do not match."]})
+
+        del data["password2"]
+        return data
+
+    def create(self, validated_data):
+        validated_data["is_active"] = True
+        user = User.objects.create_user(**validated_data)
+        return user
+
+    class Meta:
+        model = User
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "password": {"write_only": True},
+            "last_login": {"read_only": True},
+            "is_active": {"read_only": True},
+        }
+        exclude = (
+            "is_superuser",
+            "groups",
+            "user_permissions",
+            "is_staff",
+            "last_login",
+        )
