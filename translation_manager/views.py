@@ -45,7 +45,7 @@ class TranslationViewSet(viewsets.GenericViewSet):
         asc = request.query_params.get("asc")
         if q:
             data = data.filter(title__icontains=q.lower())
-        if not asc:
+        if asc and asc.lower() == "false":
             data = data.order_by("-title")
 
         serializer = self.get_serializer(data, many=True)
@@ -95,7 +95,7 @@ class TranslationViewSet(viewsets.GenericViewSet):
 
 class ChapterViewSet(viewsets.GenericViewSet):
     permission_classes = [AllowAny]
-    queryset = Chapter.objects.all()
+    queryset = Chapter.objects.all().order_by("created_at")
     serializer_class = ConciseChapterSerializer
 
     def get_serializer_class(self):
@@ -109,7 +109,7 @@ class ChapterViewSet(viewsets.GenericViewSet):
         """
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(
-            data={"all_translations": serializer.data},
+            data={"all_chapters": serializer.data},
             status=status.HTTP_200_OK,
         )
 
