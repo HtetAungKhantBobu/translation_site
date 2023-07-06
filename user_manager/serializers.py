@@ -66,7 +66,7 @@ class LoginSerializer(UserSerializer):
 
     def create(self, validated_data):
         user = authenticate(
-            email=self.validated_data["email"], password=self.validated_data["password"]
+            email=validated_data["email"], password=validated_data["password"]
         )
         if not user:
             raise ValidationError(
