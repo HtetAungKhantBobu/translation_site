@@ -96,6 +96,18 @@ class TranslationManagerTestCase(APITestCase):
         self.assertResponseCreated()
         self.assertEqual(self.response_json["title"], "Test Translation 03")
 
+    def test_translations_details(self):
+        self.set_url(
+            reverse("v1:translations-details", kwargs={"pk": self.translation01.id})
+        )
+        self.call_get_method()
+        self.assertReseponseOk()
+        self.assertEqual(self.response_json["id"], self.translation01.id)
+        chapter_no = Chapter.objects.filter(
+            parent_translation=self.translation01
+        ).count()
+        self.assertEqual(len(self.response_json["chapters"]), chapter_no)
+
     def test_chapter_list_endpoint_returns_200(self):
         self.set_url(reverse("v1:chapters-list"))
         self.call_get_method()
