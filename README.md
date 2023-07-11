@@ -32,3 +32,11 @@ Well, you only need **Docker**, and an **internet connection** i think.
         python manage.py migrate
     ```
   5. to *browse* currently availabe endpoints, go to *localhost:8000/api-explorer/*
+
+
+## Running Tests
+
+  1. Go inside the **docker container**: `translation_web` and run the following:
+    ```
+      python manage.py test
+    ```
