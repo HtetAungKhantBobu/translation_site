@@ -125,7 +125,7 @@ class ChapterViewSet(viewsets.GenericViewSet):
     @swagger_auto_schema(method="GET")
     @action(
         methods=["GET", "PATCH"],
-        permission_classes=[AllowAny],
+        permission_classes=[IsTranslatorOrReadOnly],
         detail=True,
         serializer_class=DetailedChapterSerializer,
     )

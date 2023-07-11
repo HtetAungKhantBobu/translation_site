@@ -1,4 +1,5 @@
 from django.db import models
+from user_manager.models import User
 
 
 class Genre(models.Model):
@@ -81,6 +82,9 @@ class Chapter(models.Model):
     contents = models.TextField("Translated Content", blank=True)
     published_date = models.DateTimeField(
         "Published Date and Time", blank=True, null=True
+    )
+    translator = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=True, null=True
     )
     created_at = models.DateTimeField(editable=False, auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

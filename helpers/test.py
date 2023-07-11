@@ -10,6 +10,7 @@ from user_manager.models import User
 
 class TranslationSiteBaseTestCase(APITestCase):
     def setUp(self):
+        self.current_user = None
         self.url = None
         self.format = None
         self.content_type = None
@@ -19,6 +20,8 @@ class TranslationSiteBaseTestCase(APITestCase):
         self.response_json = None
 
         self.normal_user = User.objects.create_user(email="testuser01@gmail.com")
+        self.normal_user.set_password("test_password")
+        self.normal_user.save()
         self.superuser = User.objects.create_superuser(
             email="testsuperuser01@gmail.com", password="testpw"
         )
@@ -33,6 +36,10 @@ class TranslationSiteBaseTestCase(APITestCase):
             title="Test Chapter 02-01", serial=0, parent_translation=self.translation02
         )
 
+    def set_user(self, user):
+        self.current_user = user
+        self.client.force_authenticate(user=user)
+
     def set_url(self, url):
         self.url = url
 
@@ -44,6 +51,9 @@ class TranslationSiteBaseTestCase(APITestCase):
 
     def assertResponseCreated(self):
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+    def assertResponseForbidden(self):
+        self.assertEqual(self.response.status_code, status.HTTP_403_FORBIDDEN)
 
     def build_request(self):
         r = {}
@@ -62,6 +72,17 @@ class TranslationSiteBaseTestCase(APITestCase):
 
     def call_post_method(self, data):
         self.response = self.client.post(
+            self.url,
+            data,
+            format=self.format or "json",
+            content_type=self.content_type,
+            **self.build_request()
+        )
+        self.response_json = self.response.json()
+        return self.response_json
+
+    def call_patch_method(self, data):
+        self.response = self.client.patch(
             self.url,
             data,
             format=self.format or "json",

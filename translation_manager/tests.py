@@ -2,6 +2,7 @@ from django.urls import reverse
 
 from helpers.test import TranslationSiteBaseTestCase
 from translation_manager.models import Chapter
+from user_manager.models import User
 
 
 class TranslationManagerTestCase(TranslationSiteBaseTestCase):
@@ -77,3 +78,19 @@ class TranslationManagerTestCase(TranslationSiteBaseTestCase):
         self.assertEqual(
             self.response_json["parent_translation"], self.translation01.id
         )
+
+    def test_patch_chapters(self):
+        data = {"contents": "test content."}
+        self.set_user(self.superuser)
+        self.set_url(reverse("v1:chapters-details", kwargs={"pk": self.chapter01.id}))
+        self.call_patch_method(data=data)
+        self.assertReseponseOk()
+        self.assertEqual(self.response_json["id"], self.chapter01.id)
+        self.assertEqual(self.response_json["contents"], "test content.")
+
+    def test_patch_chapters_fail_for_normal_user(self):
+        data = {"contents": "test content."}
+        self.set_user(self.normal_user)
+        self.set_url(reverse("v1:chapters-details", kwargs={"pk": self.chapter01.id}))
+        self.call_patch_method(data=data)
+        self.assertResponseForbidden()
