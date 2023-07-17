@@ -43,7 +43,7 @@ class DetailedTranslationSerializer(ConciseTranslationSerializer):
 
 class DetailedChapterSerializer(ConciseChapterSerializer):
     title = serializers.CharField(required=False)
-    published_date = serializers.DateTimeField(required=False)
+    published_date = serializers.DateTimeField(required=False, read_only=True)
     parent_translation = serializers.IntegerField(
         required=False, source="parent_translation.id"
     )
@@ -53,3 +53,10 @@ class DetailedChapterSerializer(ConciseChapterSerializer):
         fields = "__all__"
         read_only_fields = ("id", "created_at", "updated_at")
         optional_fields = [field for field in fields if field != "id"]
+
+    def create(self, validated_data):
+        parent_translation = Translation.objects.get(
+            id=validated_data["parent_translation"]["id"]
+        )
+        validated_data["parent_translation"] = parent_translation
+        return Chapter.objects.create(**validated_data)

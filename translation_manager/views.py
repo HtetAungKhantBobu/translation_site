@@ -98,10 +98,18 @@ class ChapterViewSet(viewsets.GenericViewSet):
     queryset = Chapter.objects.all().order_by("created_at")
     serializer_class = ConciseChapterSerializer
 
-    def get_serializer_class(self):
+    def get_serializer_class(self, *args, **kwargs):
         if self.serializer_class is None:
             return BaseSerializer
+        if self.action == "create":
+            return DetailedChapterSerializer
         return self.serializer_class
+
+    def get_permissions(self):
+        if self.action in ["create", "update"]:
+            permission_classes = [IsStaff]
+            return [permission() for permission in permission_classes]
+        return [permission() for permission in self.permission_classes]
 
     def list(self, request, *args, **kwargs):
         """

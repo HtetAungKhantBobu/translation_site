@@ -70,6 +70,7 @@ class TranslationManagerTestCase(TranslationSiteBaseTestCase):
             "serial": 1,
             "parent_translation": self.translation01.id,
         }
+        self.set_user(self.staff_user)
         self.set_url(reverse("v1:chapters-list"))
         self.call_post_method(data=data)
         self.assertResponseCreated()
@@ -94,3 +95,31 @@ class TranslationManagerTestCase(TranslationSiteBaseTestCase):
         self.set_url(reverse("v1:chapters-details", kwargs={"pk": self.chapter01.id}))
         self.call_patch_method(data=data)
         self.assertResponseForbidden()
+
+    def test_post_chapter_fail_for_non_staff_users(self):
+        data = {
+            "title": "test chapter title",
+            "serial": 3,
+            "contents": "test content",
+            "parent_translation": self.translation01.id,
+        }
+        self.set_user(self.normal_user)
+        self.set_url(reverse("v1:chapters-list"))
+        self.call_post_method(data=data)
+        self.assertResponseForbidden()
+
+    def test_post_chapter_success_for_staff_users(self):
+        data = {
+            "title": "test chapter title",
+            "serial": 3,
+            "contents": "test content",
+            "status": "PB",
+            "parent_translation": self.translation01.id,
+        }
+        self.set_user(self.staff_user)
+        self.set_url(reverse("v1:chapters-list"))
+        self.call_post_method(data=data)
+        self.assertResponseCreated()
+        self.assertEqual(self.response_json["title"], "test chapter title")
+        self.assertEqual(self.response_json["serial"], 3)
+        self.assertEqual(self.response_json["contents"], "test content")

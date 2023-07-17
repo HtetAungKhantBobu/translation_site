@@ -22,6 +22,10 @@ class TranslationSiteBaseTestCase(APITestCase):
         self.normal_user = User.objects.create_user(email="testuser01@gmail.com")
         self.normal_user.set_password("test_password")
         self.normal_user.save()
+        self.staff_user = User.objects.create_user(email="teststaffuser01@gmail.com")
+        self.staff_user.is_staff = True
+        self.staff_user.set_password("test_password")
+        self.staff_user.save()
         self.superuser = User.objects.create_superuser(
             email="testsuperuser01@gmail.com", password="testpw"
         )

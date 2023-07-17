@@ -2,6 +2,7 @@ from rest_framework.permissions import BasePermission
 
 __all__ = [
     "AllowAny",
+    "IsStaff",
     "IsSuperUser",
     "IsTranslatorOrReadOnly",
 ]
@@ -17,6 +18,11 @@ class AllowAny(BasePermission):
 class IsSuperUser(BasePermission):
     def has_permission(self, request, view):
         return True if request.user and request.user.is_superuser else False
+
+
+class IsStaff(BasePermission):
+    def has_permission(self, request, view):
+        return True if request.user and request.user.is_staff else False
 
 
 class IsTranslatorOrReadOnly(BasePermission):
